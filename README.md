@@ -12,7 +12,7 @@ The data will be handled using **SQL**.
 ### User Management
 There is a login system with two types of accounts: customers and administrators. The admin has access to certain functions through higher privileges such as canceling any reservation or viewing statistics (more to be determined later). The database contains userID, name, user_name and a password. The customer can book a reservation upon confirmation which he can also cancel.
 ### Interface
-We will implement a GUI on a web based app.
+Creation of a Web-Based Graphical User Interface: Dynamic visualization of available and occupied seats. 
 ### Statistical Analysis
 The mandatory statistics will be available:
 
