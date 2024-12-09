@@ -1,14 +1,14 @@
 # Survey Corps Python Project
-Remarks:
-**Bold** words are aspects that are subject to change.
+
 ## Description
-We will be working on the default project. This will be a **web** based program acting as a seat reservation site for flights.  
+We will be working on the default project. This will be a desktop application acting as a seat reservation site for flights.  
 ## Functionalities
 
 ### Data Sources and Retrieval
-The plan is to use a dataset from **kaggle** to get flight information reduced to a specific place and time; if this doesnt work out there is also the option to randomly generate a large number of flights.
+We will extract information from [this](https://www.kaggle.com/datasets/saadharoon27/airlines-dataset) dataset, more specifically from the "flights" table where we can use flight_id as a primary key. 
+We also plan to get the number of seats and its distribution from the "aircrafts_data" table; this information would be fetched externally (using the model name).
 ### Data Storage and Handling
-The data will be handled using **SQL**.
+The data will be manipulated and stored using the sqlite3 library for python.
 ### User Management
 There is a login system with two types of accounts: customers and administrators. The admin has access to certain functions through higher privileges such as canceling any reservation or viewing statistics (more to be determined later). The database contains userID, name, user_name and a password. The customer can book a reservation upon confirmation which he can also cancel.
 ### Interface
