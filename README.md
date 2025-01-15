@@ -42,7 +42,7 @@ This is to be explained later.
 - Group repository: https://github.com/Sanchez-Fernando/Survey-Corps-WiSe-2024-25.git
 - Tutor responsible:  Ole Hänies
 - Group team leader: Fernando Sanchez
-- Group members: Fernando Sanchez, Felix Schucht, Ahmad Dekmak, Andre Duong
+- Group members: Fernando Sanchez, Ahmad Dekmak, Andre Duong
 
 Contributions are to be stated later.
 ## Acknowlegdments

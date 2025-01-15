@@ -30,6 +30,7 @@ for row in rows:
     layout, row_number = aircraft
     layout = layout.replace("|", "")
     layout = layout.replace(" ", "")
+    # Layout example: "ABC| |DEF", after replacing "|", " " -> "ABCDEF"
 
     for a in layout:
         for i in range(1, row_number+1):

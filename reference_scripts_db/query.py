@@ -8,12 +8,13 @@ db_file = 'flights.sqlite'
 conn = sqlite3.connect(db_file)
 cursor = conn.cursor()
 
+user_data = ("Emma Woodhouse", "regular")
 # Define your SQL query (e.g., selecting two columns)
-query = "SELECT * FROM users"
+query = f"SELECT * FROM users WHERE name = ? AND user_type = ?;"
 #query = "UPDATE users SET user_type = 'regular' WHERE username = 'emmaW' or username = 'weltgeist';"
 
 # Execute the query
-cursor.execute(query)
+cursor.execute(query, user_data)
 
 # Fetch and print the results
 rows = cursor.fetchall()
