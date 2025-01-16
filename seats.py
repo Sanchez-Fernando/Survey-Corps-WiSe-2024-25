@@ -1,49 +1,39 @@
-import sqlite3
-import time
+import sqlite3    # Arbeiten mit einer SQLite-Datenbank
+import time       # Simulieren von Wartezeiten
 
 # Function to load users dynamically from a database
-def load_users_from_db(db_connection):
+def load_users_from_db(db_connection):     # db_connection is a connection to the data base that holds the user data.
     users = {}
-    cursor = db_connection.cursor()
-    cursor.execute("SELECT userID, name, username, password, role FROM users")
-    rows = cursor.fetchall()
-    for row in rows:
+    cursor = db_connection.cursor()        # cursor: execute SQL queries on the database
+    cursor.execute("SELECT userID, name, username, password, role FROM users")   # executes the SQL SELECT Statement 
+    rows = cursor.fetchall()               # After executing the query, all resulting rows will be fetched
+    for row in rows:                       # processes each row 
         user_id, name, username, password, role = row
-        users[username] = {"userID": user_id, "name": name, "password": password, "role": role}
+        users[username] = {"userID": user_id, "name": name, "password": password, "role": role}   # stores in dictionnary calles 'users'
     return users
 
 # Function to load the seating chart dynamically from the database
 def load_seating_chart_from_db(db_connection):
     seats = {}
     cursor = db_connection.cursor()
-    cursor.execute("SELECT row, seat, status FROM seats")
-    rows = cursor.fetchall()
-    for row in rows:
-        row_number, seat, status = row
-        if row_number not in seats:
+    cursor.execute("SELECT row, seat, status FROM seats")    # A SQL query is executed to retrieve the row, seat, and status columns from the seats table.
+    rows = cursor.fetchall()      # fetch all after executing the query
+    for row in rows:              # processes each row 
+        row_number, seat, status = row    #and unpacks the data into row_number, seat and status.
+        if row_number not in seats:       # A dictionary called seats is used to store the seat data
             seats[row_number] = {}
-        seats[row_number][seat] = status
+        seats[row_number][seat] = status    #  the values are dictionaries representing individual seats (A, B, C, D, E, F), with each seat's status as its value.
     return seats
 
 # Function to display the seat map
 def display_seats(seats):
     print("Seat Map:")
-    for row in seats:
+    for row in seats:           # The function loops through each row in the seats dictionary
+
+        # The seats are divided into two sections displays it accordingly. "X" is shown for reserved seats, while the actual seat label is shown for available seats.
         left_section = " ".join([seat if seats[row][seat] == 'Available' else 'X' for seat in ['A', 'B', 'C']])
         right_section = " ".join([seat if seats[row][seat] == 'Available' else 'X' for seat in ['D', 'E', 'F']])
         print(f"Row {row}: {left_section} |   | {right_section}")
-
-# Function to handle login
-def login(users_db):
-    username = input("Enter your username: ")
-    password = input("Enter your password: ")
-
-    if username in users_db and users_db[username]["password"] == password:
-        print(f"Welcome, {users_db[username]['name']}!")
-        return users_db[username]
-    else:
-        print("Invalid username or password!")
-        return None
 
 # Function to reserve a seat
 def reserve_seat(seats, seat_id, user):
@@ -55,7 +45,7 @@ def reserve_seat(seats, seat_id, user):
         print(f"Error: Seat {seat_id} is already reserved.")
         return
 
-    # Confirm reservation
+    # Confirm reservation. If the seat is available, the function asks the user to confirm the reservation
     confirmation = input(f"Are you sure you want to reserve seat {seat_id}? (yes/no): ").lower()
     if confirmation == "yes":
         seats[row][seat] = 'Reserved'
@@ -65,7 +55,7 @@ def reserve_seat(seats, seat_id, user):
 
 # Function to cancel a reservation (only for admin)
 def cancel_seat(seats, seat_id, user):
-    if user['role'] != 'admin':
+    if user['role'] != 'admin':          #if not admin: error
         print("Error: Only admin can cancel reservations.")
         return
     
@@ -95,11 +85,6 @@ def main():
     # Load users and seats from the database
     users_db = load_users_from_db(db_connection)
     seats_db = load_seating_chart_from_db(db_connection)
-
-    # User login
-    user = None
-    while user is None:
-        user = login(users_db)
 
     # Main menu loop
     while True:
