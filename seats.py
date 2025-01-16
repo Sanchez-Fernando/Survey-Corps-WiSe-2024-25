@@ -12,7 +12,7 @@ def load_users_from_db(db_connection):     # db_connection is a connection to th
         users[username] = {"userID": user_id, "name": name, "password": password, "role": role}   # stores in dictionnary calles 'users'
     return users
 
-# Function to load the seating chart dynamically from the database
+# Function to load the seating chart dynamically from the database.
 def load_seating_chart_from_db(db_connection):
     seats = {}
     cursor = db_connection.cursor()
