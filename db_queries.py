@@ -12,9 +12,13 @@ def gimme_tuples(table, columns='*', identifier=None):
     
     conn = sqlite3.connect('flights.sqlite')
     cursor = conn.cursor()
-    cursor.execute(f"SELECT {columns} FROM {table};")
+    query = f"SELECT {columns} FROM {table};"
+    if identifier is not None:
+        query = f"SELECT {columns} FROM {table} WHERE username = '{identifier['username']}';"
+    cursor.execute(query)
     rows = cursor.fetchall()
     conn.close()
+
     return rows
 
 def is_in_table(table, values):
