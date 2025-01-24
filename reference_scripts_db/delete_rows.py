@@ -1,3 +1,4 @@
+# DONT run this script
 import sqlite3
 
 # Specify the condition for deletion
@@ -9,7 +10,7 @@ cursor = conn.cursor()
 
 # Construct the WHERE clause
 where_clause = " AND ".join([f"{col} = ?" for col in condition.keys()])
-query = f"DELETE FROM bookings;"
+query = f"DELETE FROM ;"
 
 # Execute the query with the values
 cursor.execute(query)

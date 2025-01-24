@@ -248,6 +248,13 @@ class MainMenu(tk.Frame):
         print(f"Searching for flight ID: {flight_id}")
 
 
+class Stats(tk.Frame):
+    pass
+
+class AddFlights(tk.Frame):
+    pass
+
+
 # Run the application
 if __name__ == "__main__":
     app = App()
