@@ -5,10 +5,9 @@ def gimme_tuples(table, columns='*', identifier=None):
     Requests all rows from a table in the database.
     
     :param table: The name of the table to query.
-    :param columns: The columns to select from the table. Default is all columns.
-    :param identifier: A dictionary with the column names and values to filter the rows.
+    :param columns='*': The columns to select from the table. Default is all columns.
+    :param identifier=None: A dictionary with the column names and values to filter the rows.
     """
-    #TODO: Use logic to implement the identifier parameter
     
     conn = sqlite3.connect('flights.sqlite')
     cursor = conn.cursor()
