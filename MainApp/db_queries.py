@@ -1,4 +1,9 @@
 import sqlite3
+import os
+
+# Get the absolute path to the current directory
+current_dir = os.path.abspath(os.path.dirname(__file__))
+db_path = os.path.join(current_dir, 'flights.sqlite')
 
 def gimme_tuples(table, columns='*', identifier=None):
     """
@@ -9,7 +14,7 @@ def gimme_tuples(table, columns='*', identifier=None):
     :param identifier=None: A dictionary with the column names and values to filter the rows.
     """
     
-    conn = sqlite3.connect('flights.sqlite')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     query = f"SELECT {columns} FROM {table};"
     if identifier is not None:
@@ -28,7 +33,7 @@ def is_in_table(table, values):
     :param table: The name of the table to check.
     :return: True if the row exists, False otherwise.
     """
-    conn = sqlite3.connect('flights.sqlite')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     # Construct the WHERE clause
@@ -48,4 +53,3 @@ def update_row(table, values):
 
 def delete_row(table, values):
     pass
-

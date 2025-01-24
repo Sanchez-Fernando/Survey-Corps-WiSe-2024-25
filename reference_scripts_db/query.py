@@ -1,11 +1,13 @@
 # Description: Use this script for simple queries.
 import sqlite3
+import os
 
-# Path to the SQLite file (same folder as the script)
-db_file = 'flights.sqlite'  
+# Get the absolute path to the current directory
+current_dir = os.path.abspath(os.path.dirname(__file__))
+db_path = os.path.join(current_dir, '../MainApp/flights.sqlite')
 
 # Connect to the SQLite database
-conn = sqlite3.connect(db_file)
+conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
 
 user_data = ("Emma Woodhouse", "regular")
