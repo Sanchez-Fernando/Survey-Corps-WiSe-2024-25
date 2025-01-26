@@ -37,8 +37,7 @@ class App(tk.Tk):
         Args:
             page_class (class): The class of the page to be displayed.
         """
-        # TODO: Plan when and when not to use this conditional, e.g. when logging off you need to reset all Frames
-        # Maybe doesnt matter, user info keeps being stored
+        # All pages are created anew each time we use show_page, it doesnt matter since we have user_info
         if (page_class not in self.pages) or (page_class != WelcomeMenu):
             # If the page doesn't exist, create it
             page = page_class(self.container, self)
@@ -86,6 +85,8 @@ class WelcomeMenu(tk.Frame):
         # "Login" Button
         tk.Button(self, text="Login", command=lambda: controller.show_page(LoginPage)).pack(pady=10)
 
+        #TODO: add register functionality
+        
         # "Exit" Button
         tk.Button(self, text="Exit", command=self.exit_with_message).pack(pady=10)
 
@@ -200,7 +201,7 @@ class MyAccountPage(tk.Frame):
 # Main Menu Page, all functionalities can be accessed from here
 class MainMenu(tk.Frame):
     """
-    The main menu page class that displays the main menu options.
+    The main menu page class that displays the main menu options and enables booking flights.
 
     Methods:
         __init__(parent, controller): Initializes the main menu page.
@@ -216,32 +217,28 @@ class MainMenu(tk.Frame):
         button_frame = tk.Frame(self)
         button_frame.pack(anchor="ne", padx=10, pady=10)
 
-        tk.Button(button_frame, text="My Account", command=lambda: controller.show_page(MyAccountPage)).pack(side="left", padx=5)
-        tk.Button(button_frame, text="Log Off", command=lambda: controller.show_page(WelcomeMenu)).pack(side="left", padx=5)
-
         # Admin-only buttons
         user_info = controller.get_user_info()
         if user_info["user_type"] == "admin":
-            tk.Button(button_frame, text="Stats", command=self.show_stats).pack(side="left", padx=5)
-            tk.Button(button_frame, text="Add Flights", command=self.add_flights).pack(side="left", padx=5)
+            tk.Button(button_frame, text="Stats", command=lambda: controller.show_page(Stats)).pack(side="left", padx=5)
+            tk.Button(button_frame, text="Manage Flights", command=lambda: controller.show_page(ManageFlights)).pack(side="left", padx=5)
+
+        tk.Button(button_frame, text="My Bookings").pack(side="left", padx=5)
+        tk.Button(button_frame, text="My Account", command=lambda: controller.show_page(MyAccountPage)).pack(side="left", padx=5)
+        tk.Button(button_frame, text="Log Off", command=lambda: controller.show_page(WelcomeMenu)).pack(side="left", padx=5)
 
         # Search field in the center
         search_frame = tk.Frame(self)
         search_frame.pack(expand=True, pady=10, anchor="n")
 
-        tk.Label(search_frame, text="Search Flight by ID:").pack(pady=5)
+        tk.Label(search_frame, text="Book Flight\nSearch Flight by ID:").pack(pady=5)
         self.search_entry = tk.Entry(search_frame)
         self.search_entry.pack(pady=5)
         tk.Button(search_frame, text="Search", command=self.search_flight).pack(pady=5)
 
-    def show_stats(self):
-        # Placeholder for admin-only functionality
-        print("Show stats functionality")
 
-    def add_flights(self):
-        # Placeholder for admin-only functionality
-        print("Add flights functionality")
-
+    #TODO: add search, display and book functionality
+    # Placeholder for search functionality
     def search_flight(self):
         flight_id = self.search_entry.get()
         # Implement the search functionality here
@@ -249,9 +246,135 @@ class MainMenu(tk.Frame):
 
 
 class Stats(tk.Frame):
-    pass
+    """
+    Admin only statistics page class that displays stats for each individual flight.
 
-class AddFlights(tk.Frame):
+    Methods:
+        __init__(parent, controller): Initializes the stats page.
+    """
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.controller = controller
+        
+        # Upper left buttons
+        button_frame = tk.Frame(self)
+        button_frame.pack(anchor="ne", padx=10, pady=10)
+        
+        tk.Button(button_frame, text="Return", command=lambda: controller.show_page(MainMenu)).pack(side="left", padx=5)
+        tk.Button(button_frame, text="Log Off", command=lambda: controller.show_page(WelcomeMenu)).pack(side="left", padx=5)
+
+        # Search field in the center
+        search_frame = tk.Frame(self)
+        search_frame.pack(expand=True, pady=10, anchor="n")
+
+        tk.Label(search_frame, text="Show Stats\nSearch Flight by ID:").pack(pady=5)
+        self.search_entry = tk.Entry(search_frame)
+        self.search_entry.pack(pady=5)
+        tk.Button(search_frame, text="Search", command=self.search_flight).pack(pady=5)
+
+    #TODO: add stats functionality
+    # Placeholder for search functionality
+    def search_flight(self):
+        flight_id = self.search_entry.get()
+        # Implement the search functionality here
+        print(f"Searching for flight ID: {flight_id}")
+
+        
+
+class ManageFlights(tk.Frame):
+    """
+    Admin only page to create new templates for aircrafts and to add flights to the database.
+
+    Methods:
+        __init__(parent, controller): Initializes the stats page.
+    """
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.controller = controller
+        
+        # Upper left buttons
+        button_frame = tk.Frame(self)
+        button_frame.pack(anchor="ne", padx=10, pady=10)
+        
+        tk.Button(button_frame, text="Return", command=lambda: controller.show_page(MainMenu)).pack(side="left", padx=5)
+        tk.Button(button_frame, text="Log Off", command=lambda: controller.show_page(WelcomeMenu)).pack(side="left", padx=5)
+
+        # action field in the center
+        action_frame = tk.Frame(self)
+        action_frame.pack(expand=True, pady=10, anchor="n")
+
+        tk.Label(action_frame, text="Add to/Remove from the database").pack(pady=5)
+
+        # Create a frame to hold the buttons
+        button_frame = tk.Frame(action_frame)
+        button_frame.pack(pady=5)
+
+        # Add buttons side by side
+        tk.Button(button_frame, text="Add aircraft", command=self.aircraft_options).pack(side=tk.LEFT, padx=5)
+        tk.Button(button_frame, text="Add/Remove flight", command=self.flight_options).pack(side=tk.LEFT, padx=5)
+
+        # Frame to either add or remove aircrafts or flights
+        self.options_frame = tk.Frame(action_frame)
+        self.options_frame.pack(anchor="n", padx=10, pady=10)
+
+    #TODO: add functionalities to all these functions add aircrafts and flights 
+    # and potentially change names to not match those on the database
+
+    def clear_options_frame(self):
+        for widget in self.options_frame.winfo_children():
+            widget.destroy()
+
+    def aircraft_options(self):
+        self.clear_options_frame()
+    
+        # Center widget above all others
+        tk.Label(self.options_frame, text="Add aircraft:").pack(pady=5)
+
+        # Frame to hold the three widgets side by side
+        top_frame = tk.Frame(self.options_frame)
+        top_frame.pack(pady=5)
+
+        self.code = tk.Label(top_frame, text="Enter aircraft code:")
+        self.code.pack(side=tk.LEFT, padx=5)
+
+        self.layout = tk.Label(top_frame, text="Enter aircraft layout:\n e.g. 'ABC| |DEF'")
+        self.layout.pack(side=tk.LEFT, padx=5)
+
+        self.rows = tk.Label(top_frame, text="Enter number of rows:")
+        self.rows.pack(side=tk.LEFT, padx=5)
+
+        # Frame to hold the next three widgets side by side
+        middle_frame = tk.Frame(self.options_frame)
+        middle_frame.pack(pady=5)
+
+        self.aircraft_code = tk.Entry(middle_frame)
+        self.aircraft_code.pack(side=tk.LEFT, padx=5)
+
+        self.aircraft_layout = tk.Entry(middle_frame)
+        self.aircraft_layout.pack(side=tk.LEFT, padx=5)
+
+        self.row_number = tk.Entry(middle_frame)
+        self.row_number.pack(side=tk.LEFT, padx=5)
+
+        # Widget at the bottom
+        tk.Button(self.options_frame, text="Add").pack(pady=5)
+
+    #TODO: finish design
+    def flight_options(self):
+        self.clear_options_frame()
+        tk.Label(self.options_frame, text="Search Flight by ID:").pack(pady=5)
+        self.search_entry = tk.Entry(self.options_frame)
+        self.search_entry.pack(pady=5)
+        tk.Button(self.options_frame, text="Search").pack(pady=5)
+
+#TODO: add booking and cancellation functionalities
+class MyBookings(tk.Frame):
+    """
+    Bookings page that displays user's bookings and allows cancellation.
+
+    Methods:
+        __init__(parent, controller): Initializes the Bookings page.
+    """
     pass
 
 

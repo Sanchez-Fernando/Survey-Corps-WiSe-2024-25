@@ -5,6 +5,7 @@ import os
 current_dir = os.path.abspath(os.path.dirname(__file__))
 db_path = os.path.join(current_dir, 'flights.sqlite')
 
+#TODO: Modify to check for all keys and values in the dictionary, like is_in_table
 def gimme_tuples(table, columns='*', identifier=None):
     """
     Requests all rows from a table in the database.
