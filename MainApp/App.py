@@ -22,7 +22,7 @@ class App(tk.Tk):
         super().__init__()
         
         self.title("Multi-Page App")
-        self.geometry("430x330")
+        self.geometry("600x600")
 
         # Container to hold all frames (pages)
         self.container = tk.Frame(self)
@@ -161,9 +161,6 @@ class LoginPage(tk.Frame):
             user["user_type"] = full_user_info_tuple[0][3]
 
             self.controller.set_user_info(user)
-            #self.username_entry.delete(0, tk.END)
-            #self.password_entry.delete(0, tk.END)
-            #self.error_message.config(text="")
             self.controller.show_page(MainMenu)
             
         else:
@@ -241,15 +238,70 @@ class MainMenu(tk.Frame):
         tk.Label(search_frame, text="Book Flight\nSearch Flight by ID:").pack(pady=5)
         self.search_entry = tk.Entry(search_frame)
         self.search_entry.pack(pady=5)
-        tk.Button(search_frame, text="Search", command=self.search_flight).pack(pady=5)
+        tk.Button(search_frame, text="Search", command=self.search_display_flight).pack(pady=5)
+        
 
 
-    #TODO: add search, display and book functionality
-    # Placeholder for search functionality
-    def search_flight(self):
+
+    def search_display_flight(self):
         flight_id = self.search_entry.get()
-        # Implement the search functionality here
-        print(f"Searching for flight ID: {flight_id}")
+
+        if db_queries.is_in_table("flights", {"flight_id": flight_id}):
+            # Display flight information
+            flight_info = db_queries.gimme_tuples("flights", identifier={"flight_id": flight_id})
+            aircraft_info = db_queries.gimme_tuples("aircrafts", identifier={"code": flight_info[0][1]})
+            booking_info = db_queries.gimme_tuples("bookings", identifier={"flight": flight_id})
+            
+            # Creates the string representation of the flight
+            seat_representation = aircraft_info[0][1].replace("| |", "|   |")
+            flight_representation = ["     " + seat_representation + "\n"]
+            rows = aircraft_info[0][2]
+
+            for i in range(rows):
+                if i+1 < 10:
+                    flight_representation += ["\n" + str(i+1) + "    " + seat_representation]
+                else:
+                    flight_representation += ["\n" + str(i+1) + "  " + seat_representation]
+                
+            # Replaces the seat number with an X if the seat is booked
+            booked_seats = [booking[1] for booking in booking_info if booking[2] is not None]
+            for seat in booked_seats:
+                flight_representation[int(seat[:-1])] = flight_representation[int(seat[:-1])].replace(seat[-1], "X")
+
+            single_string_representation = "".join(flight_representation)
+                
+            display_frame = tk.Frame(self)
+            display_frame.pack(expand=True, pady=10, anchor="n")
+            tk.Label(display_frame, text=f"Seat Layout Representation for Flight no {flight_id}\n X represents a reserved seat \n |   | represents an aisle").pack(pady=5)
+            tk.Label(display_frame, anchor = "n", text=single_string_representation).pack(pady=5)
+
+            book_seat_entry = tk.Entry(display_frame)
+            book_seat_entry.pack(pady=5, anchor="n")
+            tk.Button(display_frame, text="Book", command=lambda: self.book_seat(entry=book_seat_entry, flight_id=flight_id)).pack(pady=5, anchor="n")
+
+        else:
+            messagebox.showerror("Error", "Flight not found, please try again.")
+
+    
+    def book_seat(self, entry, flight_id):
+        booking_info_dictionary = {"seat_number": entry.get(),
+                                    "flight": flight_id,
+                                    }
+        if db_queries.is_in_table("bookings", booking_info_dictionary):
+            seat_info = db_queries.gimme_tuples("bookings", identifier=booking_info_dictionary)
+
+            if seat_info[0][2] is None:
+                booker_username ={"booker" : self.controller.get_user_info()["username"]}
+                db_queries.update_row("bookings", old_values=booking_info_dictionary, new_values=booker_username)
+                messagebox.showinfo("Info", "Booking succesful")
+
+                self.controller.show_page(EmptyPage)
+                self.controller.show_page(MainMenu)
+            else:
+                messagebox.showerror("Error", "The selected seat already booked, please choose another one.")
+
+        else:
+            messagebox.showerror("Error", "Invalid seat number, try again.")
 
 
 class Stats(tk.Frame):
@@ -526,7 +578,21 @@ class MyBookings(tk.Frame):
     Methods:
         __init__(parent, controller): Initializes the Bookings page.
     """
-    pass
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.controller = controller
+
+class EmptyPage(tk.Frame):
+    """
+    An empty page class that serves as a refresher.
+
+    Methods:
+        __init__(parent, controller): Initializes the empty page.
+    """
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.controller = controller
+
 
 
 # Run the application

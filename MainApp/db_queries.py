@@ -17,10 +17,14 @@ def gimme_tuples(table, columns='*', identifier=None):
     
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    query = f"SELECT {columns} FROM {table};"
+    
     if identifier is not None:
-        query = f"SELECT {columns} FROM {table} WHERE username = '{identifier['username']}';"
-    cursor.execute(query)
+        where_clause = "AND ".join([f"{col} = ?" for col in identifier.keys()])
+        query = f"SELECT {columns} FROM {table} WHERE {where_clause};"
+        cursor.execute(query, tuple(identifier.values()))
+    else:
+        query = f"SELECT {columns} FROM {table};"
+        cursor.execute(query)
     rows = cursor.fetchall()
     conn.close()
 
@@ -49,8 +53,26 @@ def is_in_table(table, values):
 
     return result is not None
 
-def update_row(table, values):
-    pass
+def update_row(table, old_values, new_values):
+    
+    if old_values is not None and new_values is not None:
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+
+        where_clause = "AND ".join([f"{col} = ?" for col in old_values.keys()])
+        set_clause = ", ".join([f"{col} = ?" for col in new_values.keys()])
+
+        # Combine parameters: SET values first, THEN WHERE values
+        params = tuple(list(new_values.values()) + list(old_values.values()))
+
+        # Build the query
+        query = f"UPDATE {table} SET {set_clause} WHERE {where_clause};"
+
+        cursor.execute(query, params)
+        conn.commit()
+        conn.close()
+        return True
+    return False
 
 def delete_row(table, values):
     pass
