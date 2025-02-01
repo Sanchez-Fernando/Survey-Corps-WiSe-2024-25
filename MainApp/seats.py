@@ -2,24 +2,27 @@ import sqlite3    # Arbeiten mit einer SQLite-Datenbank
 import time       # Simulieren von Wartezeiten
 
 # Function to load users dynamically from a database
+# fetchall() : After executing the query, all resulting rows will be fetched
 def load_users_from_db(db_connection):     # db_connection is a connection to the data base that holds the user data.
     users = {}
     cursor = db_connection.cursor()        # cursor: execute SQL queries on the database
     cursor.execute("SELECT userID, name, username, password, role FROM users")   # executes the SQL SELECT Statement 
-    rows = cursor.fetchall()               # After executing the query, all resulting rows will be fetched
+    rows = cursor.fetchall()               
     for row in rows:                       # processes each row 
         user_id, name, username, password, role = row
         users[username] = {"userID": user_id, "name": name, "password": password, "role": role}   # stores in dictionnary calles 'users'
     return users
 
 # Function to load the seating chart dynamically from the database.
+# cursor.execute() : A SQL query is executed to retrieve the row, seat, and status columns from the seats table.
+
 def load_seating_chart_from_db(db_connection):
     seats = {}
     cursor = db_connection.cursor()
-    cursor.execute("SELECT row, seat, status FROM seats")    # A SQL query is executed to retrieve the row, seat, and status columns from the seats table.
-    rows = cursor.fetchall()      # fetch all after executing the query
+    cursor.execute("SELECT row, seat, status FROM seats")
+    rows = cursor.fetchall()     
     for row in rows:              # processes each row 
-        row_number, seat, status = row    #and unpacks the data into row_number, seat and status.
+        row_number, seat, status = row    # and unpacks the data into row_number, seat and status.
         if row_number not in seats:       # A dictionary called seats is used to store the seat data
             seats[row_number] = {}
         seats[row_number][seat] = status    #  the values are dictionaries representing individual seats (A, B, C, D, E, F), with each seat's status as its value.
@@ -37,8 +40,8 @@ def display_seats(seats):
 
 # Function to reserve a seat
 def reserve_seat(seats, seat_id, user):
-    row = int(seat_id[0])  # Row number (e.g., '4A' -> row=4)
-    seat = seat_id[1].upper()  # Seat letter (e.g., '4A' -> seat='A')
+    row = int(seat_id[0])  # Row number ('4A' -> row=4)
+    seat = seat_id[1].upper()  # Seat letter ('4A' -> seat='A')
 
     # Check if the seat is already reserved
     if seats[row][seat] == 'Reserved':
@@ -59,8 +62,8 @@ def cancel_seat(seats, seat_id, user):
         print("Error: Only admin can cancel reservations.")
         return
     
-    row = int(seat_id[0])  # Row number (e.g., '4A' -> row=4)
-    seat = seat_id[1].upper()  # Seat letter (e.g., '4A' -> seat='A')
+    row = int(seat_id[0])  # Row number ('4A' -> row=4)
+    seat = seat_id[1].upper()  # Seat letter ('4A' -> seat='A')
 
     # Check if the seat is already available
     if seats[row][seat] == 'Available':
