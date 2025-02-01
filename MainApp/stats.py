@@ -1,5 +1,4 @@
 import sqlite3
-import matplotlib.pyplot as plt
 
 def calculate_seat_availability(flight_id, db_path):
     """
@@ -7,9 +6,8 @@ def calculate_seat_availability(flight_id, db_path):
 
     :param flight_id: The ID of the flight to analyze.
     :param db_path: Path to the SQLite database file.
-    :return: Dictionary with seat statistics.
+    :return: Dictionary with seat statistics or an error message.
     """
-    # Connect to the database
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
@@ -70,15 +68,15 @@ def calculate_seat_availability(flight_id, db_path):
     finally:
         conn.close()
 
+
 def list_seat_availability(flight_id, db_path):
     """
     Outputs the list of available and reserved seats for a specific flight.
 
     :param flight_id: The ID of the flight to analyze.
     :param db_path: Path to the SQLite database file.
-    :return: Dictionary with lists of reserved and available seats.
+    :return: Dictionary with lists of reserved and available seats or an error message.
     """
-    # Connect to the database
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
@@ -129,15 +127,15 @@ def list_seat_availability(flight_id, db_path):
     finally:
         conn.close()
 
+
 def list_users_for_flight(flight_id, db_path):
     """
     Outputs the number of users for a specific flight along with their details (username, name, user type, and booked seats).
 
     :param flight_id: The ID of the flight to analyze.
     :param db_path: Path to the SQLite database file.
-    :return: List of user details.
+    :return: List of user details or an error message.
     """
-    # Connect to the database
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
@@ -160,116 +158,3 @@ def list_users_for_flight(flight_id, db_path):
 
     finally:
         conn.close()
-
-def write_all_flight_details_to_file(flight_id, db_path, file_path):
-    """
-    Writes all flight details to a text file.
-
-    :param flight_id: The ID of the flight to analyze.
-    :param db_path: Path to the SQLite database file.
-    :param file_path: Path to the output text file.
-    """
-    try:
-        seat_data, error = calculate_seat_availability(flight_id, db_path)
-        if error:
-            raise Exception(error)
-
-        seat_list_data, error = list_seat_availability(flight_id, db_path)
-        if error:
-            raise Exception(error)
-
-        user_data, error = list_users_for_flight(flight_id, db_path)
-        if error:
-            raise Exception(error)
-
-        with open(file_path, 'w') as file:
-            file.write(f"Flight Details for flight {flight_id}\n")
-            file.write("=================\n\n")
-
-            # Write seat availability data
-            file.write("Seat Availability:\n")
-            file.write(f"Total Seats: {seat_data['total_seats']}\n")
-            file.write(f"Reserved Seats: {seat_data['reserved_seats']} ({seat_data['reserved_percentage']:.2f}%)\n")
-            file.write(f"Available Seats: {seat_data['available_seats']} ({seat_data['available_percentage']:.2f}%)\n\n")
-
-            # Write reserved and available seats
-            file.write("Reserved Seats:\n")
-            file.write(", ".join(seat_list_data['reserved_seats']) + "\n\n")
-
-            file.write("Available Seats:\n")
-            file.write(", ".join(seat_list_data['available_seats']) + "\n\n")
-
-            # Write user data
-            file.write("Users:\n")
-            for user in user_data:
-                file.write(f"Username: {user[0]}, Name: {user[1]}, User Type: {user[2]}, Booked Seats: {user[3]}\n")
-
-    except Exception as e:
-        print(f"Error writing to file: {e}")
-
-def show_flight_statistics_as_charts(flight_id, db_path):
-    """
-    Displays charts for seat availability, seat reservation percentages, and user details.
-
-    :param flight_id: The ID of the flight to analyze.
-    :param db_path: Path to the SQLite database file.
-    """
-    # Get seat availability data
-    seat_data, error = calculate_seat_availability(flight_id, db_path)
-    if error:
-        print(error)
-        return
-
-    # Get seat lists
-    seat_list_data, error = list_seat_availability(flight_id, db_path)
-    if error:
-        print(error)
-        return
-
-    # Get user data
-    user_data, error = list_users_for_flight(flight_id, db_path)
-    if error:
-        print(error)
-        return
-
-    # Chart 1: Seat Availability
-    labels = ['Reserved Seats', 'Available Seats']
-    sizes = [seat_data['reserved_seats'], seat_data['available_seats']]
-    colors = ['red', 'green']
-    plt.figure(figsize=(8, 6))
-    plt.pie(sizes, labels=labels, autopct='%1.1f%%', colors=colors, startangle=140)
-    plt.title('Seat Availability')
-    plt.show()
-
-    # Chart 2: Reserved vs Available Percentages
-    labels = ['Reserved %', 'Available %']
-    sizes = [seat_data['reserved_percentage'], seat_data['available_percentage']]
-    colors = ['blue', 'orange']
-    plt.figure(figsize=(8, 6))
-    plt.pie(sizes, labels=labels, autopct='%1.1f%%', colors=colors, startangle=140)
-    plt.title('Reservation Percentages')
-    plt.show()
-
-    # Chart 3: Users and Booked Seats
-    usernames = [user[0] for user in user_data]
-    booked_seats_count = [len(user[3].split(',')) if user[3] else 0 for user in user_data]
-    plt.figure(figsize=(10, 6))
-    plt.bar(usernames, booked_seats_count, color='purple')
-    plt.xlabel('Usernames')
-    plt.ylabel('Number of Booked Seats')
-    plt.title('Seats Booked by Users')
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-    plt.show()
-
-# Example usage
-def main():
-    write_all_flight_details_to_file(33000, 'flights.sqlite', 'flight_details.txt')
-    show_flight_statistics_as_charts(5001, 'flights.sqlite')
-
-
-if __name__ == "__main__":
-    main()
-
-
-# ich weiß nicht wie die chart in tkinter implementiert wird, muss man dann noch ändern, ist grad nur ein beispiel

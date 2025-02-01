@@ -1,5 +1,12 @@
 import tkinter as tk
 import db_queries
+import os
+
+from tkinter import messagebox
+from stats import calculate_seat_availability, list_seat_availability, list_users_for_flight
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
 
 class App(tk.Tk):
     """
@@ -255,11 +262,11 @@ class Stats(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
-        
+
         # Upper left buttons
         button_frame = tk.Frame(self)
         button_frame.pack(anchor="ne", padx=10, pady=10)
-        
+
         tk.Button(button_frame, text="Return", command=lambda: controller.show_page(MainMenu)).pack(side="left", padx=5)
         tk.Button(button_frame, text="Log Off", command=lambda: controller.show_page(WelcomeMenu)).pack(side="left", padx=5)
 
@@ -272,14 +279,158 @@ class Stats(tk.Frame):
         self.search_entry.pack(pady=5)
         tk.Button(search_frame, text="Search", command=self.search_flight).pack(pady=5)
 
-    #TODO: add stats functionality
-    # Placeholder for search functionality
-    def search_flight(self):
-        flight_id = self.search_entry.get()
-        # Implement the search functionality here
-        print(f"Searching for flight ID: {flight_id}")
+        # Button to save statistics to a text file
+        tk.Button(search_frame, text="Save Statistics to File", command=self.save_statistics_to_file).pack(pady=5)
 
-        
+        # Frame to display stats
+        self.stats_frame = tk.Frame(self)
+        self.stats_frame.pack(fill="both", expand=True, padx=10, pady=10)
+
+        # Frame for the pie chart
+        self.chart_frame = tk.Frame(self.stats_frame)
+        self.chart_frame.pack(fill="both", expand=True, pady=10)
+
+        # Variables to store current flight statistics
+        self.current_flight_id = None
+        self.seat_data = None
+        self.seat_list_data = None
+        self.user_data = None
+
+    def search_flight(self):
+        """
+        Fetch and display statistics for the entered flight ID.
+        """
+        flight_id = self.search_entry.get()
+        if not flight_id:
+            messagebox.showerror("Error", "Please enter a flight ID.")
+            return
+
+        current_dir = os.path.abspath(os.path.dirname(__file__))
+        db_path = os.path.join(current_dir, 'flights.sqlite')
+
+        # Fetch seat availability data
+        seat_data, error = calculate_seat_availability(flight_id, db_path)
+        if error:
+            messagebox.showerror("Error", error)
+            return
+
+        # Fetch seat list data
+        seat_list_data, error = list_seat_availability(flight_id, db_path)
+        if error:
+            messagebox.showerror("Error", error)
+            return
+
+        # Fetch user data
+        user_data, error = list_users_for_flight(flight_id, db_path)
+        if error:
+            messagebox.showerror("Error", error)
+            return
+
+        # Store the current flight ID and statistics
+        self.current_flight_id = flight_id
+        self.seat_data = seat_data
+        self.seat_list_data = seat_list_data
+        self.user_data = user_data
+
+        # Clear previous stats
+        self.clear_stats_frame()
+
+        # Display seat availability
+        tk.Label(self.stats_frame, text="Seat Availability", font=("Arial", 14)).pack(pady=5)
+        tk.Label(self.stats_frame, text=f"Total Seats: {seat_data['total_seats']}").pack(pady=2)
+        tk.Label(self.stats_frame, text=f"Reserved Seats: {seat_data['reserved_seats']} ({seat_data['reserved_percentage']:.2f}%)").pack(pady=2)
+        tk.Label(self.stats_frame, text=f"Available Seats: {seat_data['available_seats']} ({seat_data['available_percentage']:.2f}%)").pack(pady=2)
+
+        # Display reserved seats
+        tk.Label(self.stats_frame, text="Reserved Seats", font=("Arial", 14)).pack(pady=5)
+        reserved_seats_text = tk.Text(self.stats_frame, height=5, width=50)
+        reserved_seats_text.pack(pady=2)
+        reserved_seats_text.insert(tk.END, ", ".join(seat_list_data['reserved_seats']))
+        reserved_seats_text.config(state=tk.DISABLED)
+
+        # Display available seats
+        tk.Label(self.stats_frame, text="Available Seats", font=("Arial", 14)).pack(pady=5)
+        available_seats_text = tk.Text(self.stats_frame, height=5, width=50)
+        available_seats_text.pack(pady=2)
+        available_seats_text.insert(tk.END, ", ".join(seat_list_data['available_seats']))
+        available_seats_text.config(state=tk.DISABLED)
+
+        # Display user details
+        tk.Label(self.stats_frame, text="Users and their Booked Seats", font=("Arial", 14)).pack(pady=5)
+        users_text = tk.Text(self.stats_frame, height=10, width=50)
+        users_text.pack(pady=2)
+        for user in user_data:
+            users_text.insert(tk.END, f"Username: {user[0]}, Name: {user[1]}, User Type: {user[2]}, Booked Seats: {user[3]}\n")
+        users_text.config(state=tk.DISABLED)
+
+        # Display pie chart
+        self.show_pie_chart(seat_data)
+
+    def show_pie_chart(self, seat_data):
+        """
+        Display a pie chart of reserved and available seats.
+        """
+        # Clear previous chart widgets
+        for widget in self.chart_frame.winfo_children():
+            widget.destroy()
+
+        # Create a pie chart
+        fig, ax = plt.subplots()
+        labels = ['Reserved Seats', 'Available Seats']
+        sizes = [seat_data['reserved_seats'], seat_data['available_seats']]
+        colors = ['red', 'green']
+        ax.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=90)
+        ax.axis('equal')  # Equal aspect ratio ensures the pie chart is circular.
+
+        # Embed the pie chart in the Tkinter interface
+        canvas = FigureCanvasTkAgg(fig, master=self.chart_frame)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill="both", expand=True)
+
+    def save_statistics_to_file(self):
+        """
+        Save the current flight statistics to a text file.
+        """
+        if not self.current_flight_id:
+            messagebox.showerror("Error", "No flight statistics to save. Please search for a flight first.")
+            return
+
+        file_path = f"flight_{self.current_flight_id}_statistics.txt"
+
+        try:
+            with open(file_path, 'w') as file:
+                file.write(f"Flight Details for Flight {self.current_flight_id}\n")
+                file.write("=================\n\n")
+
+                # Write seat availability data
+                file.write("Seat Availability:\n")
+                file.write(f"Total Seats: {self.seat_data['total_seats']}\n")
+                file.write(f"Reserved Seats: {self.seat_data['reserved_seats']} ({self.seat_data['reserved_percentage']:.2f}%)\n")
+                file.write(f"Available Seats: {self.seat_data['available_seats']} ({self.seat_data['available_percentage']:.2f}%)\n\n")
+
+                # Write reserved and available seats
+                file.write("Reserved Seats:\n")
+                file.write(", ".join(self.seat_list_data['reserved_seats']) + "\n\n")
+
+                file.write("Available Seats:\n")
+                file.write(", ".join(self.seat_list_data['available_seats']) + "\n\n")
+
+                # Write user data
+                file.write("Users:\n")
+                for user in self.user_data:
+                    file.write(f"Username: {user[0]}, Name: {user[1]}, User Type: {user[2]}, Booked Seats: {user[3]}\n")
+
+            messagebox.showinfo("Success", f"Statistics saved to {file_path}")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to save statistics: {e}")
+
+    def clear_stats_frame(self):
+        """
+        Clear the stats display frame (except the chart frame).
+        """
+        for widget in self.stats_frame.winfo_children():
+            if widget != self.chart_frame:
+                widget.destroy()
 
 class ManageFlights(tk.Frame):
     """
