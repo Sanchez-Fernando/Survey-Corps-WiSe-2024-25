@@ -43,8 +43,8 @@ def calculate_seat_availability(flight_id, db_path):
         # Step 5: Calculate the total number of seats
         total_seats = column_length * max_rows
 
-        # Step 6: Get the number of reserved seats
-        cursor.execute("SELECT COUNT(*) FROM bookings WHERE flight = ?", (flight_id,))
+        # Step 6: Get the number of reserved seats (where booker is NOT NULL)
+        cursor.execute("SELECT COUNT(*) FROM bookings WHERE flight = ? AND booker IS NOT NULL", (flight_id,))
         reserved_seats = cursor.fetchone()[0]
 
         # Step 7: Calculate the number of available seats
@@ -109,8 +109,8 @@ def list_seat_availability(flight_id, db_path):
         # Generate all possible seats
         all_seats = [f"{row}{col}" for row in range(1, max_rows + 1) for col in column_letters]
 
-        # Step 3: Get reserved seats
-        cursor.execute("SELECT seat_number FROM bookings WHERE flight = ?", (flight_id,))
+        # Step 3: Get reserved seats (where booker is NOT NULL)
+        cursor.execute("SELECT seat_number FROM bookings WHERE flight = ? AND booker IS NOT NULL", (flight_id,))
         reserved_seats = [row[0] for row in cursor.fetchall()]
 
         # Step 4: Calculate available seats
@@ -145,7 +145,7 @@ def list_users_for_flight(flight_id, db_path):
         SELECT DISTINCT u.username, u.name, u.user_type, GROUP_CONCAT(b.seat_number)
         FROM users u
         JOIN bookings b ON u.username = b.booker
-        WHERE b.flight = ?
+        WHERE b.flight = ? AND b.booker IS NOT NULL
         GROUP BY u.username, u.name, u.user_type
         """
         cursor.execute(query, (flight_id,))
