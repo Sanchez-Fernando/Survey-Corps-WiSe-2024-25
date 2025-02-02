@@ -301,7 +301,7 @@ class MainMenu(tk.Frame):
             tk.Button(button_frame, text="Stats", command=lambda: controller.show_page(Stats)).pack(side="left", padx=5)
             tk.Button(button_frame, text="Manage Flights", command=lambda: controller.show_page(ManageFlights)).pack(side="left", padx=5)
 
-        tk.Button(button_frame, text="My Bookings").pack(side="left", padx=5)
+        tk.Button(button_frame, text="My Bookings", command=lambda: controller.show_page(MyBookings)).pack(side="left", padx=5)
         tk.Button(button_frame, text="My Account", command=lambda: controller.show_page(MyAccountPage)).pack(side="left", padx=5)
         tk.Button(button_frame, text="Log Off", command=lambda: controller.show_page(WelcomeMenu)).pack(side="left", padx=5)
 
@@ -644,7 +644,7 @@ class ManageFlights(tk.Frame):
         self.search_entry.pack(pady=5)
         tk.Button(self.options_frame, text="Search").pack(pady=5)
 
-#TODO: add booking and cancellation functionalities.   DONE!
+
 class MyBookings(tk.Frame):
     """
     Bookings page that displays user's bookings and allows cancellation.
@@ -652,7 +652,6 @@ class MyBookings(tk.Frame):
     Methods:
         __init__(parent, controller): Initializes the Bookings page.
         load_bookings(): Loads the user's bookings and displays them.
-        book_seat(): Handles the seat booking process.
         cancel_booking(): Handles the cancellation of an existing booking.
     """
     def __init__(self, parent, controller):
@@ -685,7 +684,7 @@ class MyBookings(tk.Frame):
 
         if current_bookings:
             # Display user's bookings
-            tk.Label(self.booking_frame, text="Your Current Bookings", font=("Arial", 14)).pack(pady=10)
+            tk.Label(self.booking_frame, text=f"{username}'s Current Bookings", font=("Arial", 14)).pack(pady=10)
 
             # List the booked seats and corresponding flight details
             for booking in current_bookings:
@@ -699,10 +698,10 @@ class MyBookings(tk.Frame):
                 cancel_button.pack(pady=5)
         else:
             # If no bookings exist
-            tk.Label(self.booking_frame, text="You have no current bookings.").pack(pady=10)
+            tk.Label(self.booking_frame, text="You currently have no bookings.").pack(pady=10)
 
         # Option to book a new flight
-        tk.Button(self, text="Book New Flight", command=self.show_booking_page).pack(pady=20)
+        tk.Button(self.booking_frame, text="Main Menu", command=self.show_booking_page).pack(pady=40)
 
     def show_booking_page(self):
         """
@@ -723,7 +722,8 @@ class MyBookings(tk.Frame):
 
         # Remove the booking from the database
         booking_info = {"flight": flight_id, "seat_number": seat_number}
-        db_queries.delete_row("bookings", booking_info)
+        new_booker = {"booker": None}
+        db_queries.update_row("bookings", old_values=booking_info, new_values=new_booker)
 
         # Provide feedback
         messagebox.showinfo("Booking Canceled", f"Your booking for Flight {flight_id}, Seat {seat_number} has been canceled.")
@@ -731,32 +731,6 @@ class MyBookings(tk.Frame):
         # Refresh the bookings list
         self.load_bookings()
 
-    def book_seat(self, flight_id, seat_number):
-        """
-        Handles the seat booking process.
-        
-        Args:
-            flight_id (str): The ID of the flight to book.
-            seat_number (str): The seat number to book.
-        """
-        user_info = self.controller.get_user_info()
-        username = user_info['username']
-        
-        # Check if the seat is already booked
-        booking_info = {"flight": flight_id, "seat_number": seat_number}
-        if db_queries.is_in_table("bookings", booking_info):
-            messagebox.showerror("Error", "The seat is already booked!")
-            return
-
-        # Proceed with booking the seat
-        booking_info["booker"] = username
-        db_queries.insert_row("bookings", booking_info)
-
-        # Confirm the booking
-        messagebox.showinfo("Booking Successful", f"Your seat {seat_number} for Flight {flight_id} has been successfully booked.")
-
-        # Refresh the bookings list
-        self.load_bookings()
 
 
 class EmptyPage(tk.Frame):
