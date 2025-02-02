@@ -5,7 +5,6 @@ import os
 current_dir = os.path.abspath(os.path.dirname(__file__))
 db_path = os.path.join(current_dir, 'flights.sqlite')
 
-#TODO: Modify to check for all keys and values in the dictionary, like is_in_table
 def gimme_tuples(table, columns='*', identifier=None):
     """
     Requests all rows from a table in the database.
@@ -73,6 +72,19 @@ def update_row(table, old_values, new_values):
         conn.close()
         return True
     return False
+
+def insert_row(table, values):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    columns = ', '.join(values.keys())
+    placeholders = ', '.join(['?'] * len(values))
+
+    query = f"INSERT INTO {table} ({columns}) VALUES ({placeholders});"
+
+    cursor.execute(query, tuple(values.values()))
+    conn.commit()
+    conn.close()
 
 def delete_row(table, values):
     pass

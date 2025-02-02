@@ -92,7 +92,8 @@ class WelcomeMenu(tk.Frame):
         # "Login" Button
         tk.Button(self, text="Login", command=lambda: controller.show_page(LoginPage)).pack(pady=10)
 
-        #TODO: add register functionality
+        # "Register" Button
+        tk.Button(self, text="Create an account", command=lambda: controller.show_page(RegisterPage)).pack(pady=10)
         
         # "Exit" Button
         tk.Button(self, text="Exit", command=self.exit_with_message).pack(pady=10)
@@ -167,6 +168,78 @@ class LoginPage(tk.Frame):
             self.error_message.config(text="Wrong username or password")
 
 
+# Register Page
+class RegisterPage(tk.Frame):
+    """
+    
+    """
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.controller = controller
+
+        # Title
+        tk.Label(self, text="Create account", font=("Arial", 16)).pack(pady=20)
+
+        # Full name field
+        tk.Label(self, text="Full name:").pack(pady=5)
+        self.name_entry = tk.Entry(self)
+        self.name_entry.pack(pady=5)
+
+        # Username field
+        tk.Label(self, text="Username:").pack(pady=5)
+        self.username_entry = tk.Entry(self)
+        self.username_entry.pack(pady=5)
+
+        # Password field
+        tk.Label(self, text="Password:").pack(pady=5)
+        self.password_entry = tk.Entry(self, show="*")
+        self.password_entry.pack(pady=5)
+
+        tk.Label(self, text="Repeat Password:").pack(pady=5)
+        self.password_entry2 = tk.Entry(self, show="*")
+        self.password_entry2.pack(pady=5)
+
+        # Register Button regular
+        tk.Button(self, text="Register as user", command=lambda: self.register(user_type="regular")).pack(pady=10)
+
+        # Login Button admin
+        tk.Button(self, text="Register as admin", command=lambda: self.register(user_type="admin")).pack(pady=10)
+
+        # Back Button
+        tk.Button(self, text="Back to Welcome Menu", command=lambda: controller.show_page(WelcomeMenu)).pack(pady=10)
+
+        # Error message label
+        self.error_message = tk.Label(self, text="", fg="red")
+        self.error_message.pack(pady=5)
+
+    def register(self, user_type):
+        """
+         
+        """
+        name = self.name_entry.get()
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+        password2 = self.password_entry2.get()
+
+        try:
+            password = int(password)
+            password2 = int(password2)
+        except ValueError:
+            self.error_message.config(text="Password must be a number.")
+            return
+        
+        if password != password2:
+            self.error_message.config(text="Passwords do not match.")
+            return
+        
+        user = {"name": name, "username": username, "password": password, "user_type": user_type}
+        
+        if db_queries.is_in_table("users", {"username": user["username"]}):
+            messagebox.showerror("Error", "Username already exists, try another one.")
+        else:
+            db_queries.insert_row("users", user)
+            messagebox.showinfo("Info", "User created successfully. Please log in.")
+            self.controller.show_page(WelcomeMenu)
 
 
 # My Account Page
@@ -200,6 +273,7 @@ class MyAccountPage(tk.Frame):
             tk.Label(self, text=f"Full name: {user['name']}").pack(pady=5)
             tk.Label(self, text=f"Username: {user['username']}").pack(pady=5)
             tk.Label(self, text=f"Password: {user['password']}").pack(pady=5)
+            tk.Label(self, text=f"Status: {user['user_type']}").pack(pady=5)
 
 
 # Main Menu Page, all functionalities can be accessed from here
