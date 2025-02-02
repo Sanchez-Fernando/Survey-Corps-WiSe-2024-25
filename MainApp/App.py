@@ -1,6 +1,7 @@
 import tkinter as tk
 import db_queries
 import os
+import sys
 
 from tkinter import messagebox
 from stats import calculate_seat_availability, list_seat_availability, list_users_for_flight
@@ -17,6 +18,7 @@ class App(tk.Tk):
         show_page(page_class): Switches to the specified page.
         set_user_info(user_info2): Sets or updates the logged in user info.
         get_user_info(): Gets the logged in user info.
+        on_close: Clean up resources and close the application.
     """
     def __init__(self):
         super().__init__()
@@ -36,6 +38,9 @@ class App(tk.Tk):
 
         # Initialize and show the main menu
         self.show_page(WelcomeMenu)
+
+        # Bind the window close event to the cleanup method
+        self.protocol("WM_DELETE_WINDOW", self.on_close)
 
     def show_page(self, page_class):
         """
@@ -73,6 +78,17 @@ class App(tk.Tk):
             The dictionary containing the user information.
         """
         return self.user_info
+
+    def on_close(self):
+        """
+        Clean up resources and close the application.
+        """
+        # Close all matplotlib figures
+        plt.close('all')
+        # Destroy the Tkinter window
+        self.destroy()
+        # Terminate the Python process
+        sys.exit()
 
 # Welcome Menu Page
 class WelcomeMenu(tk.Frame):
@@ -431,8 +447,7 @@ class Stats(tk.Frame):
             messagebox.showerror("Error", "Please enter a flight ID.")
             return
 
-        current_dir = os.path.abspath(os.path.dirname(__file__))
-        db_path = os.path.join(current_dir, 'flights.sqlite')
+        db_path = "flights.sqlite"  # Adjust the path to your database
 
         # Fetch seat availability data
         seat_data, error = calculate_seat_availability(flight_id, db_path)
@@ -469,21 +484,21 @@ class Stats(tk.Frame):
 
         # Display reserved seats
         tk.Label(self.stats_frame, text="Reserved Seats", font=("Arial", 14)).pack(pady=5)
-        reserved_seats_text = tk.Text(self.stats_frame, height=5, width=50)
+        reserved_seats_text = tk.Text(self.stats_frame, height=5, width=100)
         reserved_seats_text.pack(pady=2)
         reserved_seats_text.insert(tk.END, ", ".join(seat_list_data['reserved_seats']))
         reserved_seats_text.config(state=tk.DISABLED)
 
         # Display available seats
         tk.Label(self.stats_frame, text="Available Seats", font=("Arial", 14)).pack(pady=5)
-        available_seats_text = tk.Text(self.stats_frame, height=5, width=50)
+        available_seats_text = tk.Text(self.stats_frame, height=5, width=100)
         available_seats_text.pack(pady=2)
         available_seats_text.insert(tk.END, ", ".join(seat_list_data['available_seats']))
         available_seats_text.config(state=tk.DISABLED)
 
         # Display user details
         tk.Label(self.stats_frame, text="Users and their Booked Seats", font=("Arial", 14)).pack(pady=5)
-        users_text = tk.Text(self.stats_frame, height=10, width=50)
+        users_text = tk.Text(self.stats_frame, height=10, width=100)
         users_text.pack(pady=2)
         for user in user_data:
             users_text.insert(tk.END, f"Username: {user[0]}, Name: {user[1]}, User Type: {user[2]}, Booked Seats: {user[3]}\n")
