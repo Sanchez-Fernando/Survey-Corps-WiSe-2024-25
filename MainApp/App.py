@@ -365,6 +365,7 @@ class MainMenu(tk.Frame):
             tk.Label(display_frame, text=f"Seat Layout Representation for Flight no {flight_id}\n X represents a reserved seat \n |   | represents an aisle").pack(pady=5)
             tk.Label(display_frame, anchor = "n", text=single_string_representation).pack(pady=5)
 
+            tk.Label(display_frame, text="Enter the seat number you want to book:").pack(pady=5, anchor="n")
             book_seat_entry = tk.Entry(display_frame)
             book_seat_entry.pack(pady=5, anchor="n")
             tk.Button(display_frame, text="Book", command=lambda: self.book_seat(entry=book_seat_entry, flight_id=flight_id)).pack(pady=5, anchor="n")
@@ -446,8 +447,9 @@ class Stats(tk.Frame):
         if not flight_id:
             messagebox.showerror("Error", "Please enter a flight ID.")
             return
-
-        db_path = "flights.sqlite"  # Adjust the path to your database
+        
+        current_dir = os.path.abspath(os.path.dirname(__file__))
+        db_path = os.path.join(current_dir, 'flights.sqlite')
 
         # Fetch seat availability data
         seat_data, error = calculate_seat_availability(flight_id, db_path)
