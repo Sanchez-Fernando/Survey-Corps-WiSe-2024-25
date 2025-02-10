@@ -36,6 +36,9 @@ class App(tk.Tk):
         # Dictionary to store user information
         self.user_info = {}
 
+        # List to track navigation history
+        self.navigation_history = []
+
         # Initialize and show the main menu
         self.show_page(WelcomeMenu)
 
@@ -49,6 +52,10 @@ class App(tk.Tk):
         Args:
             page_class (class): The class of the page to be displayed.
         """
+        # Add the current page to navigation history
+        if self.pages:
+            self.navigation_history.append(self.current_page)
+
         # All pages are created anew each time we use show_page, it doesnt matter since we have user_info
         if (page_class not in self.pages) or (page_class != WelcomeMenu):
             # If the page doesn't exist, create it
@@ -60,6 +67,17 @@ class App(tk.Tk):
         for page in self.pages.values():
             page.pack_forget()
         self.pages[page_class].pack(fill="both", expand=True)
+
+        # Update the current page
+        self.current_page = page_class
+
+    def show_previous_page(self):
+        """
+        Go back to the previous page in the navigation history.
+        """
+        if self.navigation_history:
+            previous_page = self.navigation_history.pop()
+            self.show_page(previous_page)
 
     def set_user_info(self, user_info2):
         """
@@ -110,6 +128,9 @@ class WelcomeMenu(tk.Frame):
 
         # "Register" Button
         tk.Button(self, text="Create an account", command=lambda: controller.show_page(RegisterPage)).pack(pady=10)
+
+        # "Help" Button
+        tk.Button(self, text="Help", command=lambda: controller.show_page(HelpPage)).pack(pady=10)
         
         # "Exit" Button
         tk.Button(self, text="Exit", command=self.exit_with_message).pack(pady=10)
@@ -152,6 +173,9 @@ class LoginPage(tk.Frame):
 
         # Back Button
         tk.Button(self, text="Back to Welcome Menu", command=lambda: controller.show_page(WelcomeMenu)).pack(pady=10)
+
+        # Help Button
+        tk.Button(self, text="Help", command=lambda: controller.show_page(HelpPage)).pack(pady=10)
 
         # Error message label
         self.error_message = tk.Label(self, text="", fg="red")
@@ -320,6 +344,9 @@ class MainMenu(tk.Frame):
         tk.Button(button_frame, text="My Bookings", command=lambda: controller.show_page(MyBookings)).pack(side="left", padx=5)
         tk.Button(button_frame, text="My Account", command=lambda: controller.show_page(MyAccountPage)).pack(side="left", padx=5)
         tk.Button(button_frame, text="Log Off", command=lambda: controller.show_page(WelcomeMenu)).pack(side="left", padx=5)
+
+        # Help Button
+        tk.Button(button_frame, text="Help", command=lambda: controller.show_page(HelpPage)).pack(side="left", padx=5)
 
         # Search field in the center
         search_frame = tk.Frame(self)
@@ -748,6 +775,46 @@ class MyBookings(tk.Frame):
         # Refresh the bookings list
         self.load_bookings()
 
+
+class HelpPage(tk.Frame):
+    """
+    The help page class that displays instructions on how to use the application.
+
+    Methods:
+        __init__(parent, controller): Initializes the help page.
+    """
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.controller = controller
+
+        # Title
+        tk.Label(self, text="Help", font=("Arial", 16)).pack(pady=20)
+        
+        # Help text (you can customize this later)
+        help_text = """
+        Welcome to Super Flights!
+
+        Here's how to use the application:
+        1. [ LOGIN ]: Enter your username and password to access your account.
+        2. [ REGISTER ]: Create a user account to use the application, or an admin account for additional features.
+        3. [ MAIN MENU ]: After logging in, you can book flights, view your bookings, or access admin features.
+        4. [ MY BOOKINGS ]: Book or cancel seats from your desired flight.
+        5. [ STATS (ADMIN ONLY) ]: View statistics for flights, including seat availability and user details.
+        6. [ MANAGE FLIGHTS (ADMIN ONLY) ]: Add or remove flights and aircraft from the database.
+        7. [ MY ACCOUNT ]: View your account information.
+        8. [ HELP ]: Access this page for instructions on how to use the application.
+        """
+
+        tk.Label(self, text=help_text, justify=tk.LEFT).pack(pady=10, padx=10)
+
+        # Return button
+        tk.Button(self, text="Return", command=self.return_to_previous_page).pack(pady=10)
+
+    def return_to_previous_page(self):
+        """
+        Return to the previous page.
+        """
+        self.controller.show_previous_page()
 
 
 class EmptyPage(tk.Frame):
