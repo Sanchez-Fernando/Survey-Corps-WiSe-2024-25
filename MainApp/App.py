@@ -120,6 +120,11 @@ class WelcomeMenu(tk.Frame):
         super().__init__(parent)
         self.controller = controller
 
+        # Help Button in the upper right corner
+        help_frame = tk.Frame(self)
+        help_frame.pack(anchor="ne", padx=10, pady=10)
+        tk.Button(help_frame, text="Help", command=lambda: controller.show_page(HelpPage)).pack()
+
         # Title
         tk.Label(self, text="Super flights", font=("Arial", 16)).pack(pady=20)
 
@@ -128,9 +133,6 @@ class WelcomeMenu(tk.Frame):
 
         # "Register" Button
         tk.Button(self, text="Create an account", command=lambda: controller.show_page(RegisterPage)).pack(pady=10)
-
-        # "Help" Button
-        tk.Button(self, text="Help", command=lambda: controller.show_page(HelpPage)).pack(pady=10)
         
         # "Exit" Button
         tk.Button(self, text="Exit", command=self.exit_with_message).pack(pady=10)
@@ -155,6 +157,11 @@ class LoginPage(tk.Frame):
         super().__init__(parent)
         self.controller = controller
 
+        # Help Button in the upper right corner
+        help_frame = tk.Frame(self)
+        help_frame.pack(anchor="ne", padx=10, pady=10)
+        tk.Button(help_frame, text="Help", command=lambda: controller.show_page(HelpPage)).pack()
+
         # Title
         tk.Label(self, text="Login", font=("Arial", 16)).pack(pady=20)
 
@@ -173,9 +180,6 @@ class LoginPage(tk.Frame):
 
         # Back Button
         tk.Button(self, text="Back to Welcome Menu", command=lambda: controller.show_page(WelcomeMenu)).pack(pady=10)
-
-        # Help Button
-        tk.Button(self, text="Help", command=lambda: controller.show_page(HelpPage)).pack(pady=10)
 
         # Error message label
         self.error_message = tk.Label(self, text="", fg="red")
@@ -216,6 +220,11 @@ class RegisterPage(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
+
+        # Help Button in the upper right corner
+        help_frame = tk.Frame(self)
+        help_frame.pack(anchor="ne", padx=10, pady=10)
+        tk.Button(help_frame, text="Help", command=lambda: controller.show_page(HelpPage)).pack()
 
         # Title
         tk.Label(self, text="Create account", font=("Arial", 16)).pack(pady=20)
@@ -295,6 +304,11 @@ class MyAccountPage(tk.Frame):
         super().__init__(parent)
         self.controller = controller
 
+        # Help Button in the upper right corner
+        help_frame = tk.Frame(self)
+        help_frame.pack(anchor="ne", padx=10, pady=10)
+        tk.Button(help_frame, text="Help", command=lambda: controller.show_page(HelpPage)).pack()
+
         # Title
         tk.Label(self, text="My Account", font=("Arial", 16)).pack(pady=20)
 
@@ -345,12 +359,12 @@ class MainMenu(tk.Frame):
         tk.Button(button_frame, text="My Account", command=lambda: controller.show_page(MyAccountPage)).pack(side="left", padx=5)
         tk.Button(button_frame, text="Log Off", command=lambda: controller.show_page(WelcomeMenu)).pack(side="left", padx=5)
 
-        # Help Button
-        tk.Button(button_frame, text="Help", command=lambda: controller.show_page(HelpPage)).pack(side="left", padx=5)
-
         # Search field in the center
         search_frame = tk.Frame(self)
         search_frame.pack(expand=True, pady=10, anchor="n")
+
+        # Help Button
+        tk.Button(button_frame, text="Help", command=lambda: controller.show_page(HelpPage)).pack(side="left", padx=5)
 
         tk.Label(search_frame, text="Book Flight\nSearch Flight by ID:").pack(pady=5)
         self.search_entry = tk.Entry(search_frame)
@@ -439,6 +453,9 @@ class Stats(tk.Frame):
 
         tk.Button(button_frame, text="Return", command=lambda: controller.show_page(MainMenu)).pack(side="left", padx=5)
         tk.Button(button_frame, text="Log Off", command=lambda: controller.show_page(WelcomeMenu)).pack(side="left", padx=5)
+
+        # Help Button
+        tk.Button(button_frame, text="Help", command=lambda: controller.show_page(HelpPage)).pack(side="left", padx=5)
 
         # Search field in the center
         search_frame = tk.Frame(self)
@@ -612,13 +629,16 @@ class ManageFlights(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
-        
+
         # Upper left buttons
         button_frame = tk.Frame(self)
         button_frame.pack(anchor="ne", padx=10, pady=10)
         
         tk.Button(button_frame, text="Return", command=lambda: controller.show_page(MainMenu)).pack(side="left", padx=5)
         tk.Button(button_frame, text="Log Off", command=lambda: controller.show_page(WelcomeMenu)).pack(side="left", padx=5)
+
+        # Help Button
+        tk.Button(button_frame, text="Help", command=lambda: controller.show_page(HelpPage)).pack(side="left", padx=5)
 
         # action field in the center
         action_frame = tk.Frame(self)
@@ -701,6 +721,11 @@ class MyBookings(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
+
+        # Help Button in the upper right corner
+        help_frame = tk.Frame(self)
+        help_frame.pack(anchor="ne", padx=10, pady=10)
+        tk.Button(help_frame, text="Help", command=lambda: controller.show_page(HelpPage)).pack()
 
         # Title
         tk.Label(self, text="My Bookings", font=("Arial", 16)).pack(pady=20)
