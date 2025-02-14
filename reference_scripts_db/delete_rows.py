@@ -15,7 +15,7 @@ cursor = conn.cursor()
 
 # Construct the WHERE clause
 where_clause = " AND ".join([f"{col} = ?" for col in condition.keys()])
-query = f"DELETE FROM users WHERE password = 3456;"
+query = f"DELETE FROM aircrafts WHERE code = 'AAA';"
 
 # Execute the query with the values
 cursor.execute(query)

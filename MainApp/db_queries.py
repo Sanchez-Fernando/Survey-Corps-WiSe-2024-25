@@ -87,4 +87,45 @@ def insert_row(table, values):
     conn.close()
 
 def delete_row(table, values):
-    pass
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    where_clause = " AND ".join([f"{col} = ?" for col in values.keys()])
+    query = f"DELETE FROM {table} WHERE {where_clause};"
+
+    cursor.execute(query, tuple(values.values()))
+    conn.commit()
+    conn.close()
+
+def add_rows_to_bookings(flight_id, aircraft_code):
+    """
+    Ad hoc function to add rows to the bookings table based on the aircraft layout.
+    """
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+
+    bookings_data = []
+
+    query = f"SELECT layout, row_number FROM aircrafts WHERE code = '{aircraft_code}';"
+    cursor.execute(query)
+    aircraft = cursor.fetchone()
+
+    layout, row_number = aircraft
+    layout = layout.replace("|", "")
+    layout = layout.replace(" ", "")
+
+    for a in layout:
+        for i in range(1, row_number+1):
+            bookings_data.append((flight_id, f"{i}{a}", None))
+
+    insert_sql = """
+    INSERT INTO bookings (flight, seat_number, booker)
+    VALUES (?, ?, ?);
+    """
+
+    for booking in bookings_data:
+        cursor.execute(insert_sql, booking)
+
+    conn.commit()
+    conn.close()

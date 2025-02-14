@@ -12,10 +12,10 @@ cursor = connection.cursor()
 
 # Insert a row into a table
 insert_query = """
-INSERT INTO users (username, name, password, user_type)
-VALUES (?, ?, ?, ?);
+INSERT INTO flights (flight_id, aircraft_code)
+VALUES (?, ?);
 """
-data = ('weltgeist', 'Georg Wilhelm Friedrich Hegel', 11111115, 'regular')
+data = (33009, 'CR2')
 
 try:
     cursor.execute(insert_query, data)
