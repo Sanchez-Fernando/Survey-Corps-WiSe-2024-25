@@ -12,7 +12,7 @@ cursor = conn.cursor()
 
 user_data = ("Emma Woodhouse", "regular")
 # Define your SQL query (e.g., selecting two columns)
-query = f"SELECT * FROM bookings;"
+query = f"SELECT * FROM users;"
 #query = "UPDATE users SET user_type = 'regular' WHERE username = 'emmaW' or username = 'weltgeist';"
 
 # Execute the query

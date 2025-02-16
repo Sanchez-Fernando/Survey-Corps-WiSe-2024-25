@@ -46,4 +46,6 @@ This is to be explained later.
 
 Contributions are to be stated later.
 ## Acknowlegdments
-This section will be progressively filled out the more we work on the project.
+Fernando: Database, Register, Logging, My Account.
+Andre: Stats, Help.
+Ahmad: My Bookings, Reservierung.
