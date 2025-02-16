@@ -1,40 +1,31 @@
 # Survey Corps Python Project
 
 ## Description
-We will be working on the default project. This will be a desktop application acting as a seat reservation site for flights.  
+The (default) project implements a seat reservation system for an airplane consisting of:
+- A database for data storage
+- A frontend
+- A computing backend implemented in Python
 ## Functionalities
 
 ### Data Sources and Retrieval
-We will extract information from [this](https://www.kaggle.com/datasets/saadharoon27/airlines-dataset) dataset, more specifically from the "flights" table where we can use flight_id as a primary key. 
-We also plan to get the number of seats and its distribution from the "aircrafts_data" table; this information would be fetched externally (using the model name).
+We extract information from [this](https://www.kaggle.com/datasets/saadharoon27/airlines-dataset) dataset, more specifically from the "flights" table. 
+We also extract the number of seats and its distribution from the "aircrafts_data" table; this information is fetched externally (using the model name).
 ### Data Storage and Handling
-The data will be manipulated and stored using the sqlite3 library for python.
+The data gets manipulated and stored using the sqlite3 library for python.
 ### User Management
-There is a login system with two types of accounts: customers and administrators. The admin has access to certain functions through higher privileges such as canceling any reservation or viewing statistics (more to be determined later). The database contains userID, name, user_name and a password. The customer can book a reservation upon confirmation which he can also cancel.
+There is a login system with two types of accounts: customers and administrators. The customer can book a reservation upon confirmation which he can also cancel. The admin additionally has access to functions such as canceling any reservation, managing flights or viewing statistics. You can create an account on the Welcome Menu.
 ### Interface
-A desktop application is planned to be developed using PyQt. The application will feature a tab-based interface, allowing users to access various functionalities conveniently. The planned tabs and their functionalities are as follows:
--	Reservation and Booking Tab: This tab will enable users to reserve and book seats.
--	Booking History Tab: Users can view their past bookings in this section.
--	Statistics Tab: This tab will display various statistics.
--	User Management Tab (Optional): This tab will be available exclusively to admin users.
--	Help Page Tab: A dedicated tab to describe the functionality of the application
-
+The desktop application utilizes tkinter. It features a tab-based interface, allowing users to access various functionalities conveniently.
 ### Statistical Analysis
-The mandatory statistics will be available:
+The statistics of the specific flight information will be visualized in a pie chart through Matplotlib (admin only).
+This information can be saved into a text file.
 
-- Number and percentage of available seats
-- Number and percentage of reserved seats
-- List of available seats 
-- List of seats that are not available
-- Number of users in the system with their information, except for their password
-
-Plus seat prices and cashflow. 
-These statistics will have also a graphical representation.
-
-### Visualizations
-Mathplotlib will be used for the visualization of charts and graphics.
 ## Installation and Usage
-This is to be explained later.
+Clone this Repository.
+This application runs on Python.
+Sample admin account: 
+- Username: angel31
+- Password: 54321
 
 ## Group Details
 - Group name: Survey Corps
@@ -44,8 +35,7 @@ This is to be explained later.
 - Group team leader: Fernando Sanchez
 - Group members: Fernando Sanchez, Ahmad Dekmak, Andre Duong
 
-Contributions are to be stated later.
-## Acknowlegdments
-Fernando: Database, Register, Logging, My Account.
-Andre: Stats, Help.
-Ahmad: My Bookings, Reservierung.
+## Acknowledgments
+- Fernando: Database, Login & Register, MyAccount, Interface.
+- Andre: Statistics, Help Page
+- Ahmad: MyBookings, Reservations
